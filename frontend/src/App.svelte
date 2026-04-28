@@ -1,10 +1,12 @@
 <script lang="ts">
   import './lib/styles/global.css';
+  import LocationConsent from './lib/ui/LocationConsent.svelte';
+  import LoadingScreen from './lib/ui/LoadingScreen.svelte';
+  import ErrorScreen from './lib/ui/ErrorScreen.svelte';
   import SwipeDeck from './lib/ui/SwipeDeck.svelte';
-  import { SwipeDeckStore } from './lib/application/swipe-deck.svelte';
-  import { dummyRestaurants } from './lib/infrastructure/restaurants.dummy';
+  import { AppFlowStore } from './lib/application/app-flow.svelte';
 
-  const store = new SwipeDeckStore(dummyRestaurants);
+  const flow = new AppFlowStore();
 </script>
 
 <header class="app-header">
@@ -12,7 +14,18 @@
 </header>
 
 <main class="app-main">
-  <SwipeDeck {store} />
+  {#if flow.phase === 'consent'}
+    <LocationConsent onConsent={() => flow.grantLocation()} />
+  {:else if flow.phase === 'loading'}
+    <LoadingScreen />
+  {:else if flow.phase === 'error'}
+    <ErrorScreen
+      message={flow.errorMessage ?? '알 수 없는 오류'}
+      onRetry={() => flow.retry()}
+    />
+  {:else if flow.phase === 'ready' && flow.deck}
+    <SwipeDeck store={flow.deck} />
+  {/if}
 </main>
 
 <style>

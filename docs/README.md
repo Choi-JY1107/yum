@@ -19,8 +19,9 @@
 | [0003](./decisions/0003-card-swipe-gesture.md) | 카드 스와이프 → **svelte-gestures + Svelte spring/tweened** | ✅ Accepted |
 | [0004](./decisions/0004-typescript.md) | **TypeScript 사용** | ✅ Accepted |
 | [0005](./decisions/0005-monorepo-structure.md) | 디렉토리 구조 → **모노레포 (frontend/, backend/)** | ✅ Accepted |
+| [0006](./decisions/0006-mock-api-strategy.md) | Mock API 전략 → **Vite middleware + 갈아끼움 패턴** | ✅ Accepted |
 | - | SSGOI 도입 (페이지 전환) | ⏸️ 보류 — 라우터 도입 시점에 재검토 |
-| - | 백엔드 (Go vs Node.js) | 🟡 미정 |
+| - | 백엔드 (Go vs Node.js) | 🟡 미정 — ADR-0006 패턴 따라 도입 시 자연 흡수 |
 
 ## 작성 원칙
 - **간결하게**: 토이 프로젝트 문서가 100페이지가 되면 안 된다.
