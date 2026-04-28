@@ -64,22 +64,14 @@
       <div class="swipe-deck__empty">
         <p class="swipe-deck__empty-title">오늘의 후보를 다 봤어요</p>
         <p class="swipe-deck__empty-meta">킵한 가게 {store.likedIds.length}곳</p>
-        <button
-          type="button"
-          class="swipe-deck__reset"
-          onclick={() => store.reset()}
-        >
+        <button type="button" class="swipe-deck__reset" onclick={() => store.reset()}>
           다시 시작
         </button>
       </div>
     {:else}
       <div
         class="swipe-deck__hit-area"
-        {...usePan(
-          handlePan,
-          () => ({ delay: 0, touchAction: 'none' }),
-          { onpanup: handlePanUp },
-        )}
+        {...usePan(handlePan, () => ({ delay: 0, touchAction: 'none' }), { onpanup: handlePanUp })}
       >
         {#each store.visibleStack as restaurant, stackIndex (restaurant.id)}
           <RestaurantCard

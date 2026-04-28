@@ -26,8 +26,9 @@
   --radius-lg: 24px;
 
   /* Typography */
-  --font-base: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Apple SD Gothic Neo',
-    'Segoe UI', Roboto, sans-serif;
+  --font-base:
+    -apple-system, BlinkMacSystemFont, 'Pretendard', 'Apple SD Gothic Neo', 'Segoe UI', Roboto,
+    sans-serif;
   --font-size-sm: 13px;
   --font-size-md: 15px;
   --font-size-lg: 18px;

@@ -19,10 +19,7 @@
   {:else if flow.phase === 'loading'}
     <LoadingScreen />
   {:else if flow.phase === 'error'}
-    <ErrorScreen
-      message={flow.errorMessage ?? '알 수 없는 오류'}
-      onRetry={() => flow.retry()}
-    />
+    <ErrorScreen message={flow.errorMessage ?? '알 수 없는 오류'} onRetry={() => flow.retry()} />
   {:else if flow.phase === 'ready' && flow.deck}
     <SwipeDeck store={flow.deck} />
   {/if}

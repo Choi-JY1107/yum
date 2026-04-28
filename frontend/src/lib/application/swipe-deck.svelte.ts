@@ -37,10 +37,7 @@ export class SwipeDeckStore {
   swipe(direction: SwipeDirection): void {
     const target = this.all[this.cursor];
     if (!target) return;
-    this.history = [
-      ...this.history,
-      { restaurantId: target.id, direction, timestamp: Date.now() },
-    ];
+    this.history = [...this.history, { restaurantId: target.id, direction, timestamp: Date.now() }];
     this.cursor += 1;
   }
 

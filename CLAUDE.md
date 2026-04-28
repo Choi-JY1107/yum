@@ -29,6 +29,11 @@
 - **기술 스택과 MVP 스코프는 사용자와 함께 결정**한다. 임의 추천·확장 금지.
 - 스코프 확장 의심 시 작업 전에 사용자에게 확인한다.
 
+### R6. Lint & Format은 자동 도구에 위임
+- 가이드: [`docs/conventions/lint-format.md`](./docs/conventions/lint-format.md)
+- 코드 작성 후: `npm run format && npm run lint`
+- 스타일 논쟁 금지 — Prettier 결정에 따른다.
+
 ---
 
 ## 🗂️ 프로젝트 구조
@@ -74,6 +79,7 @@ yum/
 - **카드 스와이프 제스처:** **`svelte-gestures` 5.x + Svelte `spring`/`tweened`** (ADR-0003 ✅)
 - **페이지 전환(SSGOI):** ⏸️ **보류** — 라우터 도입 시점에 재검토
 - **Mock API:** Vite middleware (`/api/restaurants` → `mock/restaurants.json`, ADR-0006 ✅) — 갈아끼움 패턴
+- **Lint/Format:** **ESLint 10 + Prettier 3** (Svelte/TS 플러그인, ADR-0007 ✅) — `npm run lint`, `npm run format`
 - **백엔드:** 🟡 미정 — Go 또는 Node.js 검토 중. ADR-0006 패턴으로 도입 시 프론트 코드 변경 0
 
 > 이 스냅샷은 결정이 바뀔 때마다 갱신한다. 상세 근거는 `docs/decisions/`를 본다.

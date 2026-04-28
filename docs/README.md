@@ -8,6 +8,7 @@
 ### 📐 [conventions/](./conventions) — 코딩·아키텍처 규칙
 - [clean-architecture.md](./conventions/clean-architecture.md) — 클린 아키텍처 + 클린 코드 가이드
 - [bem.md](./conventions/bem.md) — BEM 명명 규칙
+- [lint-format.md](./conventions/lint-format.md) — ESLint + Prettier 사용법
 
 ### 🧭 [decisions/](./decisions) — ADR (Architecture Decision Records)
 중요한 기술·스코프 결정의 **이유**를 보존한다. 새 결정은 다음 번호로 추가한다.
@@ -20,6 +21,7 @@
 | [0004](./decisions/0004-typescript.md) | **TypeScript 사용** | ✅ Accepted |
 | [0005](./decisions/0005-monorepo-structure.md) | 디렉토리 구조 → **모노레포 (frontend/, backend/)** | ✅ Accepted |
 | [0006](./decisions/0006-mock-api-strategy.md) | Mock API 전략 → **Vite middleware + 갈아끼움 패턴** | ✅ Accepted |
+| [0007](./decisions/0007-lint-format.md) | Lint & Format → **ESLint + Prettier (Svelte/TS 플러그인)** | ✅ Accepted |
 | - | SSGOI 도입 (페이지 전환) | ⏸️ 보류 — 라우터 도입 시점에 재검토 |
 | - | 백엔드 (Go vs Node.js) | 🟡 미정 — ADR-0006 패턴 따라 도입 시 자연 흡수 |
 

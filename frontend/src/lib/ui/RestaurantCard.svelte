@@ -23,7 +23,8 @@
   class="restaurant-card"
   class:restaurant-card--top={isTop}
   class:restaurant-card--dragging={isDragging}
-  style="z-index: {10 - stackIndex}; transform: translateX({dragOffset + stackOffsetX}px) rotate({tilt}deg);"
+  style="z-index: {10 - stackIndex}; transform: translateX({dragOffset +
+    stackOffsetX}px) rotate({tilt}deg);"
 >
   <div class="restaurant-card__media">
     <img
