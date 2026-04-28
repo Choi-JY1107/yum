@@ -49,10 +49,12 @@ yum/
 │   └── conventions/               ← 코딩·아키텍처 규칙
 │       ├── clean-architecture.md
 │       └── bem.md
-├── frontend/                      ← Svelte 5 + Vite + TS (ADR-0005)
-│   ├── mock/                      ← Mock API 응답 (ADR-0006, 번들 제외)
+├── frontend/                      ← Svelte 5 + Vite + TS (ADR-0005, Vercel Project Root)
+│   ├── api/                       ← Vercel Serverless Functions (ADR-0008)
+│   │   └── restaurants.ts         ← prod에서 /api/restaurants 응답
+│   ├── mock/                      ← Mock API 응답 (ADR-0006)
 │   │   └── restaurants.json
-│   ├── vite.config.ts             ← mock middleware 또는 server.proxy 스위치
+│   ├── vite.config.ts             ← dev mock middleware 또는 server.proxy 스위치
 │   └── src/
 │       └── lib/
 │           ├── domain/            ← 순수 타입·규칙
@@ -80,6 +82,7 @@ yum/
 - **페이지 전환(SSGOI):** ⏸️ **보류** — 라우터 도입 시점에 재검토
 - **Mock API:** Vite middleware (`/api/restaurants` → `mock/restaurants.json`, ADR-0006 ✅) — 갈아끼움 패턴
 - **Lint/Format:** **ESLint 10 + Prettier 3** (Svelte/TS 플러그인, ADR-0007 ✅) — `npm run lint`, `npm run format`
+- **배포:** **Vercel + GitHub + Serverless Function** (ADR-0008 ✅) — `frontend/api/restaurants.ts`가 prod의 mock 응답
 - **백엔드:** 🟡 미정 — Go 또는 Node.js 검토 중. ADR-0006 패턴으로 도입 시 프론트 코드 변경 0
 
 > 이 스냅샷은 결정이 바뀔 때마다 갱신한다. 상세 근거는 `docs/decisions/`를 본다.

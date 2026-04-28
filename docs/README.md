@@ -22,6 +22,7 @@
 | [0005](./decisions/0005-monorepo-structure.md) | 디렉토리 구조 → **모노레포 (frontend/, backend/)** | ✅ Accepted |
 | [0006](./decisions/0006-mock-api-strategy.md) | Mock API 전략 → **Vite middleware + 갈아끼움 패턴** | ✅ Accepted |
 | [0007](./decisions/0007-lint-format.md) | Lint & Format → **ESLint + Prettier (Svelte/TS 플러그인)** | ✅ Accepted |
+| [0008](./decisions/0008-vercel-deployment.md) | 배포 → **Vercel + GitHub + Serverless Function** | ✅ Accepted |
 | - | SSGOI 도입 (페이지 전환) | ⏸️ 보류 — 라우터 도입 시점에 재검토 |
 | - | 백엔드 (Go vs Node.js) | 🟡 미정 — ADR-0006 패턴 따라 도입 시 자연 흡수 |
 
