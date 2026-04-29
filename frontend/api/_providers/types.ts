@@ -7,6 +7,12 @@ export type RestaurantSummary = Omit<Restaurant, 'imageUrl'>;
 export interface SearchOptions {
   readonly radiusMeters?: number;
   readonly limit?: number;
+  readonly page?: number;
+}
+
+export interface SearchResult {
+  readonly summaries: RestaurantSummary[];
+  readonly hasMore: boolean;
 }
 
 export type RestaurantSource = 'mock' | 'kakao';
@@ -14,7 +20,7 @@ export type PhotoSource = 'mock' | 'naver';
 
 export interface RestaurantProvider {
   readonly source: RestaurantSource;
-  search(coords: Coordinates, opts?: SearchOptions): Promise<RestaurantSummary[]>;
+  search(coords: Coordinates, opts?: SearchOptions): Promise<SearchResult>;
 }
 
 export interface PhotoProvider {
@@ -26,4 +32,5 @@ export interface PhotoProvider {
 export interface ResponseMeta {
   readonly restaurantSource: RestaurantSource;
   readonly photoSource: PhotoSource;
+  readonly hasMore: boolean;
 }

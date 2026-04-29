@@ -24,8 +24,11 @@ function mockApi(): Plugin {
             const url = new URL(req.url ?? '', 'http://localhost');
             const latStr = url.searchParams.get('lat');
             const lngStr = url.searchParams.get('lng');
+            const pageStr = url.searchParams.get('page');
             const lat = latStr !== null ? Number(latStr) : NaN;
             const lng = lngStr !== null ? Number(lngStr) : NaN;
+            const pageNum = pageStr !== null ? Number(pageStr) : 1;
+            const page = Number.isFinite(pageNum) && pageNum >= 1 ? Math.floor(pageNum) : 1;
 
             if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
               res.statusCode = 400;
@@ -34,7 +37,7 @@ function mockApi(): Plugin {
               return;
             }
 
-            const result = await buildRestaurantsResponse({ lat, lng });
+            const result = await buildRestaurantsResponse({ lat, lng }, { page });
             res.setHeader('Content-Type', 'application/json; charset=utf-8');
             res.end(JSON.stringify(result));
           } catch (err) {

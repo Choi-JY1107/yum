@@ -10,6 +10,9 @@
 
   let { restaurant, dragOffset = 0, stackIndex = 0, isDragging = false }: Props = $props();
 
+  // 핫링크 차단·404 등으로 이미지 로드 실패 시 placeholder로 fallback
+  let imageError = $state(false);
+
   const STACK_OFFSET_X_PX = 8;
 
   const isTop = $derived(stackIndex === 0);
@@ -27,12 +30,13 @@
     stackOffsetX}px) rotate({tilt}deg);"
 >
   <div class="restaurant-card__media">
-    {#if restaurant.imageUrl}
+    {#if restaurant.imageUrl && !imageError}
       <img
         class="restaurant-card__image"
         src={restaurant.imageUrl}
         alt={restaurant.name}
         draggable="false"
+        onerror={() => (imageError = true)}
       />
     {:else}
       <div class="restaurant-card__placeholder" aria-hidden="true">🍽️</div>

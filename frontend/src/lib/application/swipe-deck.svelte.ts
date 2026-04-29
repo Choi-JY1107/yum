@@ -4,7 +4,7 @@ import type { SwipeDirection, SwipeResult } from '../domain/swipe';
 const STACK_VISIBLE_COUNT = 3;
 
 export class SwipeDeckStore {
-  private readonly all: Restaurant[];
+  private all = $state<Restaurant[]>([]);
   private cursor = $state(0);
   private history = $state<SwipeResult[]>([]);
 
@@ -39,6 +39,16 @@ export class SwipeDeckStore {
     if (!target) return;
     this.history = [...this.history, { restaurantId: target.id, direction, timestamp: Date.now() }];
     this.cursor += 1;
+  }
+
+  append(more: Restaurant[]): void {
+    if (more.length === 0) return;
+    this.all = [...this.all, ...more];
+  }
+
+  // 사용자가 "그만하기" → cursor를 끝으로 이동시켜 isFinished 트리거
+  finishEarly(): void {
+    this.cursor = this.all.length;
   }
 
   reset(): void {

@@ -1,5 +1,10 @@
 import type { Coordinates } from '../../src/lib/domain/location.js';
-import type { RestaurantProvider, RestaurantSummary, SearchOptions } from './types.js';
+import type {
+  RestaurantProvider,
+  RestaurantSummary,
+  SearchOptions,
+  SearchResult,
+} from './types.js';
 
 const KAKAO_API_URL = 'https://dapi.kakao.com/v2/local/search/category.json';
 const FOOD_CATEGORY_CODE = 'FD6'; // 음식점
@@ -23,7 +28,11 @@ interface KakaoDocument {
 
 interface KakaoCategoryResponse {
   readonly documents: KakaoDocument[];
-  readonly meta: { readonly total_count: number; readonly is_end: boolean };
+  readonly meta: {
+    readonly total_count: number;
+    readonly pageable_count: number;
+    readonly is_end: boolean;
+  };
 }
 
 export class KakaoRestaurantProvider implements RestaurantProvider {
@@ -34,7 +43,7 @@ export class KakaoRestaurantProvider implements RestaurantProvider {
     this.apiKey = apiKey;
   }
 
-  async search(coords: Coordinates, opts?: SearchOptions): Promise<RestaurantSummary[]> {
+  async search(coords: Coordinates, opts?: SearchOptions): Promise<SearchResult> {
     const params = new URLSearchParams({
       category_group_code: FOOD_CATEGORY_CODE,
       x: String(coords.lng),
@@ -42,6 +51,7 @@ export class KakaoRestaurantProvider implements RestaurantProvider {
       radius: String(opts?.radiusMeters ?? DEFAULT_RADIUS_M),
       sort: 'distance',
       size: String(opts?.limit ?? 10),
+      page: String(opts?.page ?? 1),
     });
 
     const response = await fetch(`${KAKAO_API_URL}?${params.toString()}`, {
@@ -55,7 +65,10 @@ export class KakaoRestaurantProvider implements RestaurantProvider {
     }
 
     const payload = (await response.json()) as KakaoCategoryResponse;
-    return payload.documents.map((doc) => this.toSummary(doc));
+    return {
+      summaries: payload.documents.map((doc) => this.toSummary(doc)),
+      hasMore: !payload.meta.is_end,
+    };
   }
 
   // 카카오 category_name 예: "음식점 > 한식 > 비빔밥"

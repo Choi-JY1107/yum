@@ -3,7 +3,7 @@ import type { PhotoProvider, RestaurantSummary } from './types.js';
 const NAVER_API_URL = 'https://openapi.naver.com/v1/search/image.json';
 const TIMEOUT_MS = 5000;
 
-interface NaverImageItem {
+export interface NaverImageItem {
   readonly title: string;
   readonly link: string;
   readonly thumbnail: string;
@@ -16,14 +16,31 @@ interface NaverImageSearchResponse {
   readonly items: NaverImageItem[];
 }
 
+// 어떤 URL을 카드에 쓸지 결정하는 어댑터 — 나중에 갈아끼움 가능 (Adapter 패턴).
+export type NaverImageUrlPicker = (item: NaverImageItem) => string | null;
+
+// Naver CDN(search.pstatic.net)이 직접 호스팅하는 thumbnail 우선.
+// 핫링크 차단(블로그·인스타 등 403)을 광범위하게 회피.
+export const pickThumbnailFirst: NaverImageUrlPicker = (item) =>
+  item.thumbnail || item.link || null;
+
+// 큰 이미지가 필요할 때 (핫링크 위험 감수).
+export const pickLinkFirst: NaverImageUrlPicker = (item) => item.link || item.thumbnail || null;
+
 export class NaverImagePhotoProvider implements PhotoProvider {
   readonly source = 'naver' as const;
   private readonly clientId: string;
   private readonly clientSecret: string;
+  private readonly urlPicker: NaverImageUrlPicker;
 
-  constructor(clientId: string, clientSecret: string) {
+  constructor(
+    clientId: string,
+    clientSecret: string,
+    urlPicker: NaverImageUrlPicker = pickThumbnailFirst,
+  ) {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
+    this.urlPicker = urlPicker;
   }
 
   async findPhotoUrl(restaurant: RestaurantSummary): Promise<string | null> {
@@ -49,6 +66,7 @@ export class NaverImagePhotoProvider implements PhotoProvider {
     }
 
     const payload = (await response.json()) as NaverImageSearchResponse;
-    return payload.items[0]?.link ?? null;
+    const item = payload.items[0];
+    return item ? this.urlPicker(item) : null;
   }
 }

@@ -7,9 +7,10 @@
 
   interface Props {
     store: SwipeDeckStore;
+    loadingMore?: boolean;
   }
 
-  let { store }: Props = $props();
+  let { store, loadingMore = false }: Props = $props();
 
   let dragX = $state(0);
   let isDragging = $state(false);
@@ -62,11 +63,16 @@
   <div class="swipe-deck__stage">
     {#if store.isFinished}
       <div class="swipe-deck__empty">
-        <p class="swipe-deck__empty-title">오늘의 후보를 다 봤어요</p>
-        <p class="swipe-deck__empty-meta">킵한 가게 {store.likedIds.length}곳</p>
-        <button type="button" class="swipe-deck__reset" onclick={() => store.reset()}>
-          다시 시작
-        </button>
+        {#if loadingMore}
+          <div class="swipe-deck__empty-spinner" aria-hidden="true"></div>
+          <p class="swipe-deck__empty-title">더 찾는 중…</p>
+        {:else}
+          <p class="swipe-deck__empty-title">오늘의 후보를 다 봤어요</p>
+          <p class="swipe-deck__empty-meta">킵한 가게 {store.likedIds.length}곳</p>
+          <button type="button" class="swipe-deck__reset" onclick={() => store.reset()}>
+            다시 시작
+          </button>
+        {/if}
       </div>
     {:else}
       <div
@@ -142,5 +148,21 @@
     color: white;
     border-radius: var(--radius-md);
     font-weight: 600;
+  }
+
+  .swipe-deck__empty-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--color-pass);
+    border-top-color: var(--color-accent);
+    border-radius: 50%;
+    margin-bottom: var(--space-md);
+    animation: swipe-deck__spin 0.8s linear infinite;
+  }
+
+  @keyframes swipe-deck__spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 </style>

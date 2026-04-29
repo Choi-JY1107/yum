@@ -7,6 +7,7 @@ export type PhotoSource = 'mock' | 'naver';
 export interface ResponseMeta {
   readonly restaurantSource: RestaurantSource;
   readonly photoSource: PhotoSource;
+  readonly hasMore: boolean;
 }
 
 export interface RestaurantsResponse {
@@ -14,10 +15,14 @@ export interface RestaurantsResponse {
   readonly meta: ResponseMeta;
 }
 
-export async function fetchRestaurants(coords: Coordinates): Promise<RestaurantsResponse> {
+export async function fetchRestaurants(
+  coords: Coordinates,
+  page: number = 1,
+): Promise<RestaurantsResponse> {
   const params = new URLSearchParams({
     lat: String(coords.lat),
     lng: String(coords.lng),
+    page: String(page),
   });
 
   const response = await fetch(`/api/restaurants?${params}`);
