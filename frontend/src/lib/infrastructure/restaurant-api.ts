@@ -1,11 +1,20 @@
 import type { Restaurant } from '../domain/restaurant';
 import type { Coordinates } from '../domain/location';
 
-interface RestaurantsResponse {
-  restaurants: Restaurant[];
+export type RestaurantSource = 'mock' | 'kakao';
+export type PhotoSource = 'mock' | 'naver';
+
+export interface ResponseMeta {
+  readonly restaurantSource: RestaurantSource;
+  readonly photoSource: PhotoSource;
 }
 
-export async function fetchRestaurants(coords: Coordinates): Promise<Restaurant[]> {
+export interface RestaurantsResponse {
+  readonly restaurants: Restaurant[];
+  readonly meta: ResponseMeta;
+}
+
+export async function fetchRestaurants(coords: Coordinates): Promise<RestaurantsResponse> {
   const params = new URLSearchParams({
     lat: String(coords.lat),
     lng: String(coords.lng),
@@ -17,6 +26,5 @@ export async function fetchRestaurants(coords: Coordinates): Promise<Restaurant[
     throw new Error(`식당 목록을 불러오지 못했어요 (HTTP ${response.status})`);
   }
 
-  const body = (await response.json()) as RestaurantsResponse;
-  return body.restaurants;
+  return (await response.json()) as RestaurantsResponse;
 }

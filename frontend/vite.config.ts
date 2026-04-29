@@ -1,9 +1,16 @@
 import { defineConfig, type Plugin } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
-import { getPhotoProvider, getRestaurantProvider } from './api/_providers/factory.js';
+import { buildRestaurantsResponse } from './api/_providers/build-response.js';
+
+// .env.local 을 process.env 로 로드 (Node 22+ 내장)
+// 프로덕션(Vercel)에선 대시보드 환경변수가 자동 주입되므로 이 파일은 의미 없음.
+try {
+  process.loadEnvFile('.env.local');
+} catch {
+  // .env.local 없으면 무시 — factory가 자동으로 mock fallback
+}
 
 const MOCK_LATENCY_MS = 400;
-const SEARCH_LIMIT = 10;
 
 function mockApi(): Plugin {
   return {
@@ -11,36 +18,32 @@ function mockApi(): Plugin {
     configureServer(server) {
       server.middlewares.use('/api/restaurants', (req, res) => {
         void (async () => {
-          await new Promise((resolve) => setTimeout(resolve, MOCK_LATENCY_MS));
+          try {
+            await new Promise((resolve) => setTimeout(resolve, MOCK_LATENCY_MS));
 
-          const url = new URL(req.url ?? '', 'http://localhost');
-          const latStr = url.searchParams.get('lat');
-          const lngStr = url.searchParams.get('lng');
-          const lat = latStr !== null ? Number(latStr) : NaN;
-          const lng = lngStr !== null ? Number(lngStr) : NaN;
+            const url = new URL(req.url ?? '', 'http://localhost');
+            const latStr = url.searchParams.get('lat');
+            const lngStr = url.searchParams.get('lng');
+            const lat = latStr !== null ? Number(latStr) : NaN;
+            const lng = lngStr !== null ? Number(lngStr) : NaN;
 
-          if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-            res.statusCode = 400;
+            if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+              res.statusCode = 400;
+              res.setHeader('Content-Type', 'application/json; charset=utf-8');
+              res.end(JSON.stringify({ error: 'lat and lng query params are required' }));
+              return;
+            }
+
+            const result = await buildRestaurantsResponse({ lat, lng });
             res.setHeader('Content-Type', 'application/json; charset=utf-8');
-            res.end(JSON.stringify({ error: 'lat and lng query params are required' }));
-            return;
+            res.end(JSON.stringify(result));
+          } catch (err) {
+            const message = err instanceof Error ? err.message : 'Internal error';
+            console.error('[mock-api] /api/restaurants failed:', err);
+            res.statusCode = 500;
+            res.setHeader('Content-Type', 'application/json; charset=utf-8');
+            res.end(JSON.stringify({ error: message }));
           }
-
-          const restaurantProvider = getRestaurantProvider();
-          const photoProvider = getPhotoProvider();
-
-          const summaries = await restaurantProvider.search({ lat, lng }, { limit: SEARCH_LIMIT });
-          const photoUrls = await Promise.all(
-            summaries.map((summary) => photoProvider.findPhotoUrl(summary.name)),
-          );
-
-          const restaurants = summaries.map((summary, i) => ({
-            ...summary,
-            imageUrl: photoUrls[i] ?? '',
-          }));
-
-          res.setHeader('Content-Type', 'application/json; charset=utf-8');
-          res.end(JSON.stringify({ restaurants }));
         })();
       });
     },

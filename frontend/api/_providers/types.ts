@@ -9,10 +9,20 @@ export interface SearchOptions {
   readonly limit?: number;
 }
 
+export type RestaurantSource = 'mock' | 'kakao';
+export type PhotoSource = 'mock' | 'naver';
+
 export interface RestaurantProvider {
+  readonly source: RestaurantSource;
   search(coords: Coordinates, opts?: SearchOptions): Promise<RestaurantSummary[]>;
 }
 
 export interface PhotoProvider {
+  readonly source: PhotoSource;
   findPhotoUrl(query: string): Promise<string | null>;
+}
+
+export interface ResponseMeta {
+  readonly restaurantSource: RestaurantSource;
+  readonly photoSource: PhotoSource;
 }

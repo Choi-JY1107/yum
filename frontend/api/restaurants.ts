@@ -1,9 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import type { Coordinates } from '../src/lib/domain/location.js';
-import type { Restaurant } from '../src/lib/domain/restaurant.js';
-import { getPhotoProvider, getRestaurantProvider } from './_providers/factory.js';
-
-const SEARCH_LIMIT = 10;
+import { buildRestaurantsResponse } from './_providers/build-response.js';
 
 function parseCoordinates(req: VercelRequest): Coordinates | null {
   const { lat, lng } = req.query;
@@ -22,20 +19,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return;
   }
 
-  const restaurantProvider = getRestaurantProvider();
-  const photoProvider = getPhotoProvider();
-
-  const summaries = await restaurantProvider.search(coords, { limit: SEARCH_LIMIT });
-  const photoUrls = await Promise.all(
-    summaries.map((summary) => photoProvider.findPhotoUrl(summary.name)),
-  );
-
-  const restaurants: Restaurant[] = summaries.map((summary, i) => ({
-    ...summary,
-    imageUrl: photoUrls[i] ?? '',
-  }));
-
-  res.setHeader('Content-Type', 'application/json; charset=utf-8');
-  res.setHeader('Cache-Control', 'public, max-age=60');
-  res.status(200).json({ restaurants });
+  try {
+    const result = await buildRestaurantsResponse(coords);
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=60');
+    res.status(200).json(result);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Internal error';
+    console.error('[api/restaurants] failed:', err);
+    res.status(500).json({ error: message });
+  }
 }

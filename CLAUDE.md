@@ -39,6 +39,11 @@
 - 작업이 끝나면 `git status --short`로 변경사항을 보여주고 **검사 요청** → 사용자 "ok/ㄱㄱ/커밋해" 등 명시 승인 후에만 `git commit` 실행.
 - `git push`도 동일.
 
+### R8. dev 서버·장기 실행 서비스는 사용자가 직접 실행
+- `npm run dev`, `vercel dev` 등 **절대 자동 실행 금지** (background/foreground 모두).
+- 정적 검증(`npm run check / lint / format / build`)만 자동 OK — 종료하는 명령만 실행.
+- 동작 확인이 필요하면 사용자에게 "dev 서버 띄워달라"고 요청하고 결과 받기.
+
 ---
 
 ## 🗂️ 프로젝트 구조
