@@ -4,6 +4,7 @@
   import LoadingScreen from './lib/ui/LoadingScreen.svelte';
   import ErrorScreen from './lib/ui/ErrorScreen.svelte';
   import MockDataBanner from './lib/ui/MockDataBanner.svelte';
+  import LocationFallbackBanner from './lib/ui/LocationFallbackBanner.svelte';
   import SwipeDeck from './lib/ui/SwipeDeck.svelte';
   import { AppFlowStore } from './lib/application/app-flow.svelte';
 
@@ -49,6 +50,9 @@
   {:else if flow.phase === 'error'}
     <ErrorScreen message={flow.errorMessage ?? '알 수 없는 오류'} onRetry={() => flow.retry()} />
   {:else if flow.phase === 'ready' && flow.deck}
+    {#if flow.usedFallbackLocation}
+      <LocationFallbackBanner reason={flow.locationFallbackReason} />
+    {/if}
     {#if flow.meta?.restaurantSource === 'mock'}
       <MockDataBanner />
     {/if}

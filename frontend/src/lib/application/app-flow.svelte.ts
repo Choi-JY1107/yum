@@ -1,5 +1,10 @@
 import type { Coordinates } from '../domain/location';
 import { DEFAULT_COORDINATES } from '../domain/location';
+import {
+  GeolocationError,
+  getCurrentLocation,
+  type GeolocationFailureReason,
+} from '../infrastructure/geolocation';
 import type { ResponseMeta } from '../infrastructure/restaurant-api';
 import { fetchRestaurants } from '../infrastructure/restaurant-api';
 import { SwipeDeckStore } from './swipe-deck.svelte';
@@ -13,14 +18,23 @@ export class AppFlowStore {
   meta = $state<ResponseMeta | null>(null);
   loadingMore = $state(false);
 
+  // 실 위치 못 가져왔을 때 default(마곡)로 fallback했음을 표시
+  usedFallbackLocation = $state(false);
+  locationFallbackReason = $state<GeolocationFailureReason | null>(null);
+
   private coords: Coordinates | null = null;
   private currentPage = 1;
 
-  async grantLocation(coords: Coordinates = DEFAULT_COORDINATES): Promise<void> {
+  async grantLocation(): Promise<void> {
     this.phase = 'loading';
     this.errorMessage = null;
-    this.coords = coords;
+    this.usedFallbackLocation = false;
+    this.locationFallbackReason = null;
     this.currentPage = 1;
+
+    const coords = await this.resolveCoordinates();
+    this.coords = coords;
+
     try {
       const result = await fetchRestaurants(coords, 1);
       this.deck = new SwipeDeckStore(result.restaurants);
@@ -54,5 +68,19 @@ export class AppFlowStore {
 
   retry(): void {
     void this.grantLocation();
+  }
+
+  // 실 geolocation 시도. 실패 시 default 좌표로 fallback (UI 배너로 알림).
+  private async resolveCoordinates(): Promise<Coordinates> {
+    try {
+      return await getCurrentLocation();
+    } catch (err) {
+      const reason: GeolocationFailureReason =
+        err instanceof GeolocationError ? err.reason : 'unavailable';
+      console.warn(`[AppFlow] geolocation failed (${reason}), using default:`, err);
+      this.usedFallbackLocation = true;
+      this.locationFallbackReason = reason;
+      return DEFAULT_COORDINATES;
+    }
   }
 }
