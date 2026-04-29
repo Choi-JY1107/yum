@@ -34,6 +34,11 @@
 - 코드 작성 후: `npm run format && npm run lint`
 - 스타일 논쟁 금지 — Prettier 결정에 따른다.
 
+### R7. 커밋은 사용자 승인 후에만
+- 단계 완료·빌드 통과 시점에도 **자동 커밋 금지**.
+- 작업이 끝나면 `git status --short`로 변경사항을 보여주고 **검사 요청** → 사용자 "ok/ㄱㄱ/커밋해" 등 명시 승인 후에만 `git commit` 실행.
+- `git push`도 동일.
+
 ---
 
 ## 🗂️ 프로젝트 구조
@@ -79,10 +84,12 @@ yum/
 - **스타일링:** **순수 CSS + Svelte `<style>` + BEM** (Tailwind 미사용, ADR-0002 ✅)
 - **카드 스와이프 제스처:** **`svelte-gestures` 5.x + Svelte `spring`/`tweened`** (ADR-0003 ✅)
 - **페이지 전환(SSGOI):** ⏸️ **보류** — 라우터 도입 시점에 재검토
-- **Mock API:** Vite middleware (`/api/restaurants` → `mock/restaurants.json`, ADR-0006 ✅) — 갈아끼움 패턴
+- **Mock API:** Vite middleware + Vercel function이 같은 모듈(`api/_data.ts`) import (ADR-0006 ✅)
+- **외부 API (다음 단계):** 카카오 로컬(텍스트) + 네이버 이미지(사진), Adapter 패턴 (ADR-0009 ✅)
+- **백엔드 스택:** **Node.js (TS) on Vercel Serverless** (ADR-0010 ✅) — Go 옵션은 미래 마이그레이션 경로로 보존
 - **Lint/Format:** **ESLint 10 + Prettier 3** (Svelte/TS 플러그인, ADR-0007 ✅) — `npm run lint`, `npm run format`
-- **배포:** **Vercel + GitHub + Serverless Function** (ADR-0008 ✅) — `frontend/api/restaurants.ts`가 prod의 mock 응답
-- **백엔드:** 🟡 미정 — Go 또는 Node.js 검토 중. ADR-0006 패턴으로 도입 시 프론트 코드 변경 0
+- **배포:** **Vercel + GitHub + Serverless Function** (ADR-0008 ✅)
+- **고정 위치 (토이 단계):** 마곡중앙10로 70 (lat 37.5604, lng 126.8345)
 
 > 이 스냅샷은 결정이 바뀔 때마다 갱신한다. 상세 근거는 `docs/decisions/`를 본다.
 

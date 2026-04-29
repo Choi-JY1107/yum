@@ -10,6 +10,11 @@
 - [bem.md](./conventions/bem.md) — BEM 명명 규칙
 - [lint-format.md](./conventions/lint-format.md) — ESLint + Prettier 사용법
 
+### 🔍 [research/](./research) — 기술 조사·비교 (의사결정 직전 단계)
+ADR이 "결정을 박는 곳"이라면 research는 "결정 전에 옵션·근거를 비교한 자료". 결정 후에도 **변천 이력**으로 남긴다.
+- [api-pricing.md](./research/api-pricing.md) — 식당 검색 + 음식 사진 API 가격 (카카오/네이버/Google/스톡 사진)
+- [backend-stack.md](./research/backend-stack.md) — 백엔드 스택 비교 (Node.js / Go / Rust)
+
 ### 🧭 [decisions/](./decisions) — ADR (Architecture Decision Records)
 중요한 기술·스코프 결정의 **이유**를 보존한다. 새 결정은 다음 번호로 추가한다.
 
@@ -23,8 +28,9 @@
 | [0006](./decisions/0006-mock-api-strategy.md) | Mock API 전략 → **Vite middleware + 갈아끼움 패턴** | ✅ Accepted |
 | [0007](./decisions/0007-lint-format.md) | Lint & Format → **ESLint + Prettier (Svelte/TS 플러그인)** | ✅ Accepted |
 | [0008](./decisions/0008-vercel-deployment.md) | 배포 → **Vercel + GitHub + Serverless Function** | ✅ Accepted |
+| [0009](./decisions/0009-external-api-adapter.md) | 외부 API 통합 → **Adapter 패턴 (RestaurantProvider, PhotoProvider)** | ✅ Accepted |
+| [0010](./decisions/0010-backend-stack.md) | 백엔드 스택 → **Node.js (TS) on Vercel** | ✅ Accepted |
 | - | SSGOI 도입 (페이지 전환) | ⏸️ 보류 — 라우터 도입 시점에 재검토 |
-| - | 백엔드 (Go vs Node.js) | 🟡 미정 — ADR-0006 패턴 따라 도입 시 자연 흡수 |
 
 ## 작성 원칙
 - **간결하게**: 토이 프로젝트 문서가 100페이지가 되면 안 된다.
