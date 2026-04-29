@@ -53,7 +53,7 @@ yum/
 │   ├── api/                       ← Vercel Serverless Functions (ADR-0008)
 │   │   └── restaurants.ts         ← prod에서 /api/restaurants 응답
 │   ├── mock/                      ← Mock API 응답 (ADR-0006)
-│   │   └── restaurants.json
+│   │   └── restaurants.ts
 │   ├── vite.config.ts             ← dev mock middleware 또는 server.proxy 스위치
 │   └── src/
 │       └── lib/

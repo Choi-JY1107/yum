@@ -29,12 +29,14 @@
 ```
 frontend/
 ├── mock/
-│   └── restaurants.json     # 서버 응답 페이로드 (프론트 번들에 포함 X)
+│   └── restaurants.ts       # 서버 응답 페이로드 (TS 모듈, dev/prod 공용)
 ├── src/
 │   └── lib/infrastructure/
 │       └── restaurant-api.ts # fetch 클라이언트 (도메인 코드 변경 시 여기만)
 └── vite.config.ts            # mock plugin 또는 server.proxy 스위치
 ```
+
+> **주의:** Mock 데이터는 처음에 `restaurants.json`이었으나 Vercel Node 22 ESM 런타임에서 JSON 임포트가 실패해(FUNCTION_INVOCATION_FAILED), TS 모듈로 전환했다. dev/prod 양쪽 동일한 import 경로로 안전히 번들되는 게 핵심.
 
 ### API 계약 (이번 단계)
 - **GET** `/api/restaurants?lat={number}&lng={number}`
