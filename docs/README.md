@@ -9,6 +9,7 @@
 - [clean-architecture.md](./conventions/clean-architecture.md) — 클린 아키텍처 + 클린 코드 가이드
 - [bem.md](./conventions/bem.md) — BEM 명명 규칙
 - [lint-format.md](./conventions/lint-format.md) — ESLint + Prettier 사용법
+- [deployment.md](./conventions/deployment.md) — Vercel 배포 + 환경변수 가이드
 
 ### 🔍 [research/](./research) — 기술 조사·비교 (의사결정 직전 단계)
 ADR이 "결정을 박는 곳"이라면 research는 "결정 전에 옵션·근거를 비교한 자료". 결정 후에도 **변천 이력**으로 남긴다.

@@ -61,9 +61,18 @@ yum/
 │       └── bem.md
 ├── frontend/                      ← Svelte 5 + Vite + TS (ADR-0005, Vercel Project Root)
 │   ├── api/                       ← Vercel Serverless Functions (ADR-0008)
-│   │   ├── restaurants.ts         ← prod에서 /api/restaurants 응답
-│   │   └── _data.ts               ← Mock 데이터 (dev/prod 공용, ADR-0006)
-│   ├── vite.config.ts             ← dev mock middleware 또는 server.proxy 스위치
+│   │   ├── restaurants.ts         ← /api/restaurants 핸들러
+│   │   ├── _data.ts               ← 장난스러운 mock fallback 데이터
+│   │   └── _providers/            ← Adapter 패턴 (ADR-0009)
+│   │       ├── types.ts           ← RestaurantProvider, PhotoProvider 인터페이스
+│   │       ├── factory.ts         ← env 기반 구현체 선택 (Kakao/Naver/Mock)
+│   │       ├── build-response.ts  ← 응답 빌더 + 런타임 fallback 오케스트레이션
+│   │       ├── kakao-restaurant-provider.ts
+│   │       ├── naver-photo-provider.ts
+│   │       ├── mock-restaurant-provider.ts
+│   │       └── mock-photo-provider.ts
+│   ├── .env.example               ← API 키 템플릿 (.env.local로 복사 후 채움)
+│   ├── vite.config.ts             ← dev: mock middleware (build-response.ts 공유)
 │   └── src/
 │       └── lib/
 │           ├── domain/            ← 순수 타입·규칙
@@ -81,8 +90,9 @@ yum/
 
 ## 🚦 현재 상태 (스냅샷)
 
-- **MVP 1차 구현 완료** ✅ — 위치 동의 → mock API 호출 → 스와이프 카드 (`cd frontend && npm run dev` → http://localhost:5173)
-- **MVP 스코프:** 스와이프 탐색 화면 1개만 (위치 동의 + 로딩 + 에러 화면 포함)
+- **실데이터 연동 완료** ✅ (Phase 1~4) — 카카오 식당 + 네이버 사진 + Adapter + mock fallback + 배너
+- **MVP 1차 구현 완료** ✅ — 위치 동의 → API 호출 → 스와이프 카드 (`cd frontend && npm run dev` → http://localhost:5173)
+- **MVP 스코프:** 스와이프 탐색 화면 1개만 (위치 동의 + 로딩 + 에러 + 임시데이터 배너)
 - **플랫폼:** 모바일 웹 (반응형)
 - **프론트엔드:** **Svelte 5 + Vite + TypeScript** (ADR-0001, 0004 ✅)
 - **디렉토리:** **모노레포** `frontend/` + `backend/` (ADR-0005 ✅)
@@ -90,7 +100,7 @@ yum/
 - **카드 스와이프 제스처:** **`svelte-gestures` 5.x + Svelte `spring`/`tweened`** (ADR-0003 ✅)
 - **페이지 전환(SSGOI):** ⏸️ **보류** — 라우터 도입 시점에 재검토
 - **Mock API:** Vite middleware + Vercel function이 같은 모듈(`api/_data.ts`) import (ADR-0006 ✅)
-- **외부 API (다음 단계):** 카카오 로컬(텍스트) + 네이버 이미지(사진), Adapter 패턴 (ADR-0009 ✅)
+- **외부 API:** 카카오 로컬(식당 텍스트) + 네이버 이미지(음식 사진), **Adapter 패턴**으로 추상화 (ADR-0009 ✅) — 환경변수 없거나 호출 실패 시 자동 mock fallback + 노란 배너
 - **백엔드 스택:** **Node.js (TS) on Vercel Serverless** (ADR-0010 ✅) — Go 옵션은 미래 마이그레이션 경로로 보존
 - **Lint/Format:** **ESLint 10 + Prettier 3** (Svelte/TS 플러그인, ADR-0007 ✅) — `npm run lint`, `npm run format`
 - **배포:** **Vercel + GitHub + Serverless Function** (ADR-0008 ✅)
@@ -115,7 +125,23 @@ yum/
 - 상세: [ADR-0006](./docs/decisions/0006-mock-api-strategy.md), [ADR-0008](./docs/decisions/0008-vercel-deployment.md).
 
 ### D3. Mock 데이터 갈아끼움 — 현재 구조
-- 단일 진실: `frontend/api/_data.ts` (TS 모듈, `response` export).
-- dev: `vite.config.ts`의 mock middleware가 import.
-- prod: `frontend/api/restaurants.ts` (Vercel function)이 import.
+- 단일 진실: `frontend/api/_data.ts` (TS 모듈, `response` export) + `_providers/`.
+- dev: `vite.config.ts`의 mock middleware → `buildRestaurantsResponse()`.
+- prod: `api/restaurants.ts` (Vercel function) → 동일 함수.
 - → 프론트 코드(`infrastructure/restaurant-api.ts`)는 환경 무관 동일.
+
+### D4. 외부 API 활성화 함정 (Kakao 콘솔)
+- 카카오 REST API 키만 발급해도 **403 NotAuthorizedError "App disabled OPEN_MAP_AND_LOCAL service"** 떨어진다.
+- 해결: developers.kakao.com → 내 애플리케이션 → **제품 설정 → 카카오맵** 활성화 토글 ON.
+- 키 발급 ≠ 서비스 활성화. 별도 절차 필요한 카카오 제품들이 있다.
+
+### D5. 외부 API는 서버에서만 호출 — 키 절대 클라이언트 노출 X
+- 모든 외부 API 호출은 `frontend/api/` 안 (Vercel Serverless Function 또는 Vite middleware).
+- 환경변수(`KAKAO_REST_API_KEY`, `NAVER_CLIENT_ID/SECRET`)는 `process.env`로만 접근 — 브라우저에서는 undefined.
+- 브라우저 DevTools Network 탭에 **`dapi.kakao.com`이나 `openapi.naver.com`이 보이면 잘못 짠 것**.
+- 정상: `/api/restaurants` 한 줄만 보임.
+
+### D6. 카카오 502 BadGateway는 일시 글리치
+- 우리 코드 문제 아님. 카카오 게이트웨이 일시 장애.
+- `build-response.ts`의 fallback이 자동으로 mock 전환 → 사용자에겐 배너 + 임시 카드.
+- 1~2분 후 새로고침으로 복구. 지속되면 Kakao 데브톡 확인.
