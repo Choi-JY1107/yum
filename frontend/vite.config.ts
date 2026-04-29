@@ -1,6 +1,6 @@
 import { defineConfig, type Plugin } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
-import { response } from './api/_data';
+import { response } from './api/_data.js';
 
 const MOCK_LATENCY_MS = 400;
 

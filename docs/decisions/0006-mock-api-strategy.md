@@ -39,10 +39,16 @@ frontend/
 
 > **데이터 위치 변천기 (실패 → 학습)**
 > 1. **`mock/restaurants.json`** + JSON import → Vercel Node 22 ESM에서 import attribute 없이 실패 (FUNCTION_INVOCATION_FAILED)
-> 2. **`mock/restaurants.ts`** + TS import → Vercel은 `api/` 밖 파일을 transpile/번들하지 않아 ERR_MODULE_NOT_FOUND
-> 3. **`api/_data.ts`** + TS import (현재) → `api/` 안에 두어 Vercel이 함께 처리. 언더스코어 prefix는 Vercel 컨벤션상 "라우트로 노출하지 않음".
+> 2. **`mock/restaurants.ts`** + extensionless import → Vercel은 `api/` 밖 파일을 transpile/번들하지 않아 ERR_MODULE_NOT_FOUND
+> 3. **`api/_data` (extensionless)** → Vercel은 NodeNext 리졸션을 강제. 런타임에 `Cannot find module '/var/task/.../api/_data'`. 빌드 로그에 `TS2835` 경고 노출.
+> 4. **`api/_data.js` (확장자 명시)** + 파일은 `_data.ts` (현재) → ✅ TypeScript NodeNext 컨벤션. import에는 `.js`로 적고 컴파일러가 `.ts`로 매핑.
 >
 > Vite 미들웨어도 동일 모듈을 정적 import하므로 dev/prod 런타임 차이 0.
+
+### 핵심 원칙 (Vercel + TS)
+- **Serverless function의 모든 import 경로는 `.js` 확장자 명시** (소스가 `.ts`여도)
+- **함수가 의존하는 모듈은 모두 `api/` 디렉토리 안에 둔다** (외부는 자동 번들 X)
+- 라우트로 노출하지 않을 모듈은 **언더스코어 prefix** (`_data.ts` 등)
 
 ### API 계약 (이번 단계)
 - **GET** `/api/restaurants?lat={number}&lng={number}`
