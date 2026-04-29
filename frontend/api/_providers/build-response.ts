@@ -12,9 +12,10 @@ export interface RestaurantsResponse {
   readonly meta: ResponseMeta;
 }
 
-// 외부 API 실패 시 자동으로 mock으로 fallback (banner 트리거).
-// 식당 provider 실패 → 식당+사진 모두 mock으로 폴백
-// 사진 provider만 실패 → 사진만 mock으로 폴백
+// 외부 API 실패 시 자동 fallback 정책:
+// - 식당 provider 실패 → 식당+사진 모두 mock으로 (banner 트리거)
+// - 사진 provider 실패 (개별) → 해당 사진만 null (카드는 그대로, 빈 imageUrl)
+// - 사진 provider 전체 실패라도 식당이 real이면 banner는 안 띄움 (식당 정보는 살아있으니)
 export async function buildRestaurantsResponse(
   coords: Coordinates,
   limit: number = DEFAULT_LIMIT,
@@ -22,7 +23,7 @@ export async function buildRestaurantsResponse(
   let restaurantProvider = getRestaurantProvider();
   let photoProvider = getPhotoProvider();
   let restaurantSource: RestaurantSource = restaurantProvider.source;
-  let photoSource: PhotoSource = photoProvider.source;
+  const photoSource: PhotoSource = photoProvider.source;
 
   let summaries: RestaurantSummary[];
   try {
@@ -38,31 +39,19 @@ export async function buildRestaurantsResponse(
     restaurantProvider = new MockRestaurantProvider();
     photoProvider = new MockPhotoProvider();
     restaurantSource = 'mock';
-    photoSource = 'mock';
     summaries = await restaurantProvider.search(coords, { limit });
   }
 
-  let photoUrls: (string | null)[];
-  try {
-    photoUrls = await Promise.all(
-      summaries.map((summary) => photoProvider.findPhotoUrl(summary.name)),
-    );
-  } catch (err) {
-    if (photoProvider.source === 'mock') {
-      console.error('[buildResponse] mock photo provider failed:', err);
-      photoUrls = summaries.map(() => null);
-    } else {
-      console.error(
-        `[buildResponse] photo provider (${photoProvider.source}) failed, fallback to mock:`,
-        err,
-      );
-      photoProvider = new MockPhotoProvider();
-      photoSource = 'mock';
-      photoUrls = await Promise.all(
-        summaries.map((summary) => photoProvider.findPhotoUrl(summary.name)),
-      );
+  const settled = await Promise.allSettled(
+    summaries.map((summary) => photoProvider.findPhotoUrl(summary)),
+  );
+  const photoUrls: (string | null)[] = settled.map((result, i) => {
+    if (result.status === 'fulfilled') {
+      return result.value;
     }
-  }
+    console.warn(`[buildResponse] photo lookup failed for "${summaries[i]?.name}":`, result.reason);
+    return null;
+  });
 
   const restaurants: Restaurant[] = summaries.map((summary, i) => ({
     ...summary,
@@ -71,6 +60,9 @@ export async function buildRestaurantsResponse(
 
   return {
     restaurants,
-    meta: { restaurantSource, photoSource },
+    meta: {
+      restaurantSource,
+      photoSource: restaurantSource === 'mock' ? 'mock' : photoSource,
+    },
   };
 }

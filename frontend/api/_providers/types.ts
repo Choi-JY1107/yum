@@ -19,7 +19,8 @@ export interface RestaurantProvider {
 
 export interface PhotoProvider {
   readonly source: PhotoSource;
-  findPhotoUrl(query: string): Promise<string | null>;
+  // restaurant 전체를 받아 provider가 필요한 필드(name, signatureMenu 등)를 조합해 사용
+  findPhotoUrl(restaurant: RestaurantSummary): Promise<string | null>;
 }
 
 export interface ResponseMeta {
