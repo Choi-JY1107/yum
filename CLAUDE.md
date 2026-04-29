@@ -85,3 +85,25 @@ yum/
 - **백엔드:** 🟡 미정 — Go 또는 Node.js 검토 중. ADR-0006 패턴으로 도입 시 프론트 코드 변경 0
 
 > 이 스냅샷은 결정이 바뀔 때마다 갱신한다. 상세 근거는 `docs/decisions/`를 본다.
+
+---
+
+## 🐛 함정·노하우 (실패에서 배운 것들)
+
+### D1. 배포·런타임 에러는 추측 X, 로그부터
+- 빌드 로그(Vercel Deployments)와 함수 런타임 로그를 **먼저** 본다.
+- "원인일 것 같다" 추측으로 고치고 푸시하면 시간만 낭비된다 — Mock API 배포에서 세 번 헛걸음한 이력 있음.
+- 사용자가 500/에러를 알리면 → 즉시 로그 요청.
+
+### D2. Vercel Serverless Function 함정 (TS + api/)
+- **모든 의존성은 `api/` 안에 둔다** — 외부 디렉토리는 transpile·번들 X.
+- **import 경로에 `.js` 확장자 명시** — NodeNext 리졸션 강제 (소스가 `.ts`여도 `from './foo.js'`).
+- **JSON 직접 import 금지** — Node 22 ESM에서 `import attribute` 없이 실패. TS 모듈로 데이터 export.
+- **언더스코어(`_`) prefix** = "라우트로 노출하지 않음" (예: `api/_data.ts`).
+- 상세: [ADR-0006](./docs/decisions/0006-mock-api-strategy.md), [ADR-0008](./docs/decisions/0008-vercel-deployment.md).
+
+### D3. Mock 데이터 갈아끼움 — 현재 구조
+- 단일 진실: `frontend/api/_data.ts` (TS 모듈, `response` export).
+- dev: `vite.config.ts`의 mock middleware가 import.
+- prod: `frontend/api/restaurants.ts` (Vercel function)이 import.
+- → 프론트 코드(`infrastructure/restaurant-api.ts`)는 환경 무관 동일.
