@@ -51,9 +51,8 @@ yum/
 │       └── bem.md
 ├── frontend/                      ← Svelte 5 + Vite + TS (ADR-0005, Vercel Project Root)
 │   ├── api/                       ← Vercel Serverless Functions (ADR-0008)
-│   │   └── restaurants.ts         ← prod에서 /api/restaurants 응답
-│   ├── mock/                      ← Mock API 응답 (ADR-0006)
-│   │   └── restaurants.ts
+│   │   ├── restaurants.ts         ← prod에서 /api/restaurants 응답
+│   │   └── _data.ts               ← Mock 데이터 (dev/prod 공용, ADR-0006)
 │   ├── vite.config.ts             ← dev mock middleware 또는 server.proxy 스위치
 │   └── src/
 │       └── lib/

@@ -28,15 +28,21 @@
 ### 디렉토리 구조
 ```
 frontend/
-├── mock/
-│   └── restaurants.ts       # 서버 응답 페이로드 (TS 모듈, dev/prod 공용)
+├── api/
+│   ├── _data.ts             # 서버 응답 페이로드 (TS 모듈, dev/prod 공용, 언더스코어 = 라우트 아님)
+│   └── restaurants.ts       # /api/restaurants 핸들러
 ├── src/
 │   └── lib/infrastructure/
 │       └── restaurant-api.ts # fetch 클라이언트 (도메인 코드 변경 시 여기만)
 └── vite.config.ts            # mock plugin 또는 server.proxy 스위치
 ```
 
-> **주의:** Mock 데이터는 처음에 `restaurants.json`이었으나 Vercel Node 22 ESM 런타임에서 JSON 임포트가 실패해(FUNCTION_INVOCATION_FAILED), TS 모듈로 전환했다. dev/prod 양쪽 동일한 import 경로로 안전히 번들되는 게 핵심.
+> **데이터 위치 변천기 (실패 → 학습)**
+> 1. **`mock/restaurants.json`** + JSON import → Vercel Node 22 ESM에서 import attribute 없이 실패 (FUNCTION_INVOCATION_FAILED)
+> 2. **`mock/restaurants.ts`** + TS import → Vercel은 `api/` 밖 파일을 transpile/번들하지 않아 ERR_MODULE_NOT_FOUND
+> 3. **`api/_data.ts`** + TS import (현재) → `api/` 안에 두어 Vercel이 함께 처리. 언더스코어 prefix는 Vercel 컨벤션상 "라우트로 노출하지 않음".
+>
+> Vite 미들웨어도 동일 모듈을 정적 import하므로 dev/prod 런타임 차이 0.
 
 ### API 계약 (이번 단계)
 - **GET** `/api/restaurants?lat={number}&lng={number}`
