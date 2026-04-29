@@ -27,12 +27,16 @@
     stackOffsetX}px) rotate({tilt}deg);"
 >
   <div class="restaurant-card__media">
-    <img
-      class="restaurant-card__image"
-      src={restaurant.imageUrl}
-      alt={restaurant.name}
-      draggable="false"
-    />
+    {#if restaurant.imageUrl}
+      <img
+        class="restaurant-card__image"
+        src={restaurant.imageUrl}
+        alt={restaurant.name}
+        draggable="false"
+      />
+    {:else}
+      <div class="restaurant-card__placeholder" aria-hidden="true">🍽️</div>
+    {/if}
     <span
       class="restaurant-card__stamp restaurant-card__stamp--like"
       style="opacity: {likeOpacity};"
@@ -95,6 +99,16 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  .restaurant-card__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 80px;
+    opacity: 0.6;
   }
 
   .restaurant-card__stamp {
