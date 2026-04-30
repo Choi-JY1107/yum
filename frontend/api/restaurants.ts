@@ -18,6 +18,15 @@ function parsePage(req: VercelRequest): number {
   return Number.isFinite(parsed) && parsed >= 1 ? Math.floor(parsed) : 1;
 }
 
+function parseCategories(req: VercelRequest): string[] {
+  const raw = req.query.categories;
+  if (typeof raw !== 'string' || raw.length === 0) return [];
+  return raw
+    .split(',')
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
   const coords = parseCoordinates(req);
   if (!coords) {
@@ -25,9 +34,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return;
   }
   const page = parsePage(req);
+  const categories = parseCategories(req);
 
   try {
-    const result = await buildRestaurantsResponse(coords, { page });
+    const result = await buildRestaurantsResponse(coords, { page, categories });
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Cache-Control', 'public, max-age=60');
     res.status(200).json(result);

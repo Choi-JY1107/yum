@@ -1,3 +1,4 @@
+import type { Category } from '../domain/category';
 import type { Coordinates } from '../domain/location';
 import { DEFAULT_COORDINATES } from '../domain/location';
 import {
@@ -22,6 +23,9 @@ export class AppFlowStore {
   usedFallbackLocation = $state(false);
   locationFallbackReason = $state<GeolocationFailureReason | null>(null);
 
+  // 빈 배열 = 필터 없음 (전체). consent 페이지에서만 변경 가능.
+  selectedCategories = $state<Category[]>([]);
+
   private coords: Coordinates | null = null;
   private currentPage = 1;
 
@@ -36,7 +40,10 @@ export class AppFlowStore {
     this.coords = coords;
 
     try {
-      const result = await fetchRestaurants(coords, 1);
+      const result = await fetchRestaurants(coords, {
+        page: 1,
+        categories: this.selectedCategories,
+      });
       this.deck = new SwipeDeckStore(result.restaurants);
       this.meta = result.meta;
       this.phase = 'ready';
@@ -54,7 +61,10 @@ export class AppFlowStore {
     this.loadingMore = true;
     try {
       const nextPage = this.currentPage + 1;
-      const result = await fetchRestaurants(this.coords, nextPage);
+      const result = await fetchRestaurants(this.coords, {
+        page: nextPage,
+        categories: this.selectedCategories,
+      });
       this.deck.append(result.restaurants);
       this.meta = result.meta;
       this.currentPage = nextPage;
@@ -64,6 +74,20 @@ export class AppFlowStore {
     } finally {
       this.loadingMore = false;
     }
+  }
+
+  // consent 페이지에서만 호출됨. 그냥 상태만 갱신, fetch는 grantLocation이 담당.
+  toggleCategory(category: Category): void {
+    if (this.selectedCategories.includes(category)) {
+      this.selectedCategories = this.selectedCategories.filter((c) => c !== category);
+    } else {
+      this.selectedCategories = [...this.selectedCategories, category];
+    }
+  }
+
+  clearCategories(): void {
+    if (this.selectedCategories.length === 0) return;
+    this.selectedCategories = [];
   }
 
   retry(): void {

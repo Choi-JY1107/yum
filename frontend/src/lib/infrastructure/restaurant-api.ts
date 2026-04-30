@@ -15,15 +15,23 @@ export interface RestaurantsResponse {
   readonly meta: ResponseMeta;
 }
 
+export interface FetchRestaurantsOptions {
+  readonly page?: number;
+  readonly categories?: readonly string[];
+}
+
 export async function fetchRestaurants(
   coords: Coordinates,
-  page: number = 1,
+  opts: FetchRestaurantsOptions = {},
 ): Promise<RestaurantsResponse> {
   const params = new URLSearchParams({
     lat: String(coords.lat),
     lng: String(coords.lng),
-    page: String(page),
+    page: String(opts.page ?? 1),
   });
+  if (opts.categories && opts.categories.length > 0) {
+    params.set('categories', opts.categories.join(','));
+  }
 
   const response = await fetch(`/api/restaurants?${params}`);
 

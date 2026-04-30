@@ -16,6 +16,8 @@ const DEFAULT_LIMIT = 10;
 export interface BuildOptions {
   readonly limit?: number;
   readonly page?: number;
+  // 빈 배열·미지정 = 필터 없음 (전체)
+  readonly categories?: readonly string[];
 }
 
 export interface RestaurantsResponse {
@@ -33,6 +35,7 @@ export async function buildRestaurantsResponse(
 ): Promise<RestaurantsResponse> {
   const limit = opts?.limit ?? DEFAULT_LIMIT;
   const page = opts?.page ?? 1;
+  const categoryFilter = opts?.categories ?? [];
 
   let restaurantProvider = getRestaurantProvider();
   let photoProvider = getPhotoProvider();
@@ -56,7 +59,12 @@ export async function buildRestaurantsResponse(
     result = await restaurantProvider.search(coords, { limit, page });
   }
 
-  const summaries: RestaurantSummary[] = result.summaries;
+  // 카카오는 sub-category 필터 API가 없어서 응답을 받은 뒤 우리가 거른다.
+  // (mock 데이터에도 동일 적용)
+  const summaries: RestaurantSummary[] =
+    categoryFilter.length > 0
+      ? result.summaries.filter((s) => categoryFilter.includes(s.category))
+      : result.summaries;
 
   const settled = await Promise.allSettled(
     summaries.map((summary) => photoProvider.findPhotoUrl(summary)),

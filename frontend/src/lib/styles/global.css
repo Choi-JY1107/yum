@@ -49,12 +49,35 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
-  background: var(--color-bg);
+  /* 카드 스와이프 화면에서 overscroll/rubber-band 방지 */
+  overflow: hidden;
+  overscroll-behavior: none;
   color: var(--color-text);
   font-family: var(--font-base);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overscroll-behavior: none;
+}
+
+/* 화면 전체 배경 — 좌하 radial(#fedfb3) + 우하 radial(#ff937e) + linear 베이스
+   원본 구조 유지, 색만 교체 (사용자 지정). 애니메이션 없음. */
+body {
+  background:
+    radial-gradient(
+      110% 120% at 0% 100%,
+      rgba(254, 223, 179, 0.33) 0%,
+      rgba(254, 223, 179, 0.3) 28%,
+      rgba(254, 223, 179, 0.22) 54%,
+      transparent 76%
+    ),
+    radial-gradient(
+      95% 110% at 100% 100%,
+      rgba(255, 147, 126, 0.42) 0%,
+      rgba(255, 147, 126, 0.35) 32%,
+      rgba(255, 147, 126, 0.26) 58%,
+      transparent 80%
+    ),
+    linear-gradient(180deg, #fffaee, #ffeed5 50%);
+  background-attachment: fixed;
 }
 
 body {

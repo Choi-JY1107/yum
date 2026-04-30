@@ -27,7 +27,9 @@
 </script>
 
 <header class="app-header">
-  <h1 class="app-header__title">yum</h1>
+  <h1 class="app-header__title">
+    <img src="/logo.png" alt="yum" class="app-header__logo" />
+  </h1>
   {#if flow.phase === 'ready' && flow.deck && !flow.deck.isFinished}
     <button
       type="button"
@@ -44,7 +46,12 @@
 
 <main class="app-main">
   {#if flow.phase === 'consent'}
-    <LocationConsent onConsent={() => flow.grantLocation()} />
+    <LocationConsent
+      onConsent={() => flow.grantLocation()}
+      selectedCategories={flow.selectedCategories}
+      onToggleCategory={(c) => flow.toggleCategory(c)}
+      onClearCategories={() => flow.clearCategories()}
+    />
   {:else if flow.phase === 'loading'}
     <LoadingScreen />
   {:else if flow.phase === 'error'}
@@ -71,10 +78,15 @@
 
   .app-header__title {
     margin: 0;
-    font-size: var(--font-size-xl);
-    font-weight: 800;
-    color: var(--color-accent);
-    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    line-height: 0;
+  }
+
+  .app-header__logo {
+    height: 32px;
+    width: auto;
+    display: block;
   }
 
   .app-header__pill {
