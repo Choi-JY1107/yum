@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CATEGORIES, type Category } from '../domain/category';
+  import { CATEGORIES, type Category } from '../../domain/category';
 
   interface Props {
     selected: Category[];

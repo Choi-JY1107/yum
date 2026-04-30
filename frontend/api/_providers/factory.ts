@@ -1,7 +1,7 @@
-import { KakaoRestaurantProvider } from './kakao-restaurant-provider.js';
-import { MockPhotoProvider } from './mock-photo-provider.js';
-import { MockRestaurantProvider } from './mock-restaurant-provider.js';
-import { NaverImagePhotoProvider, pickLinkFirst } from './naver-photo-provider.js';
+import { KakaoRestaurantProvider } from './kakao/restaurant.js';
+import { MockPhotoProvider } from './mock/photo.js';
+import { MockRestaurantProvider } from './mock/restaurant.js';
+import { NaverImagePhotoProvider, pickLinkFirst } from './naver/photo.js';
 import type { PhotoProvider, RestaurantProvider } from './types.js';
 
 // KAKAO_REST_API_KEY 있으면 실 카카오, 없으면 mock fallback (ADR-0006)

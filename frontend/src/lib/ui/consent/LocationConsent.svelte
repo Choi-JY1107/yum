@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Category } from '../domain/category';
+  import type { Category } from '../../domain/category';
   import CategoryFilter from './CategoryFilter.svelte';
 
   interface Props {

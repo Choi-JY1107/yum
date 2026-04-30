@@ -1,43 +1,23 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import type { Coordinates } from '../src/lib/domain/location.js';
 import { buildRestaurantsResponse } from './_providers/build-response.js';
-
-function parseCoordinates(req: VercelRequest): Coordinates | null {
-  const { lat, lng } = req.query;
-  const parsedLat = typeof lat === 'string' ? Number(lat) : NaN;
-  const parsedLng = typeof lng === 'string' ? Number(lng) : NaN;
-  if (Number.isFinite(parsedLat) && Number.isFinite(parsedLng)) {
-    return { lat: parsedLat, lng: parsedLng };
-  }
-  return null;
-}
-
-function parsePage(req: VercelRequest): number {
-  const { page } = req.query;
-  const parsed = typeof page === 'string' ? Number(page) : 1;
-  return Number.isFinite(parsed) && parsed >= 1 ? Math.floor(parsed) : 1;
-}
-
-function parseCategories(req: VercelRequest): string[] {
-  const raw = req.query.categories;
-  if (typeof raw !== 'string' || raw.length === 0) return [];
-  return raw
-    .split(',')
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0);
-}
+import { parseRestaurantsQuery } from './_providers/parse-query.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
-  const coords = parseCoordinates(req);
-  if (!coords) {
-    res.status(400).json({ error: 'lat and lng query params are required' });
+  const parsed = parseRestaurantsQuery((key) => {
+    const v = req.query[key];
+    return typeof v === 'string' ? v : null;
+  });
+
+  if (!parsed.ok) {
+    res.status(400).json({ error: parsed.error });
     return;
   }
-  const page = parsePage(req);
-  const categories = parseCategories(req);
 
   try {
-    const result = await buildRestaurantsResponse(coords, { page, categories });
+    const result = await buildRestaurantsResponse(parsed.query.coords, {
+      page: parsed.query.page,
+      categories: parsed.query.categories,
+    });
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Cache-Control', 'public, max-age=60');
     res.status(200).json(result);

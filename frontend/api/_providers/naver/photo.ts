@@ -1,4 +1,4 @@
-import type { PhotoProvider, RestaurantSummary } from './types.js';
+import type { PhotoProvider, RestaurantSummary } from '../types.js';
 
 const NAVER_API_URL = 'https://openapi.naver.com/v1/search/image.json';
 const TIMEOUT_MS = 5000;

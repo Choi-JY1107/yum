@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Restaurant } from '../domain/restaurant';
+  import type { Restaurant } from '../../domain/restaurant';
 
   interface Props {
     restaurant: Restaurant;

@@ -1,5 +1,5 @@
-import { response } from '../_data.js';
-import type { PhotoProvider, RestaurantSummary } from './types.js';
+import { response } from '../../_data.js';
+import type { PhotoProvider, RestaurantSummary } from '../types.js';
 
 export class MockPhotoProvider implements PhotoProvider {
   readonly source = 'mock' as const;

@@ -2,8 +2,8 @@
   import { usePan, type PanCustomEvent } from 'svelte-gestures';
   import RestaurantCard from './RestaurantCard.svelte';
   import ActionButtons from './ActionButtons.svelte';
-  import type { SwipeDeckStore } from '../application/swipe-deck.svelte';
-  import { SWIPE_THRESHOLD_PX, type SwipeDirection } from '../domain/swipe';
+  import type { SwipeDeckStore } from '../../application/swipe-deck.svelte';
+  import { SWIPE_THRESHOLD_PX, type SwipeDirection } from '../../domain/swipe';
 
   interface Props {
     store: SwipeDeckStore;

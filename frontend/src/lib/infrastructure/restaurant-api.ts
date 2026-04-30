@@ -1,14 +1,8 @@
-import type { Restaurant } from '../domain/restaurant';
+import type { ResponseMeta } from '../domain/api-contract';
 import type { Coordinates } from '../domain/location';
+import type { Restaurant } from '../domain/restaurant';
 
-export type RestaurantSource = 'mock' | 'kakao';
-export type PhotoSource = 'mock' | 'naver';
-
-export interface ResponseMeta {
-  readonly restaurantSource: RestaurantSource;
-  readonly photoSource: PhotoSource;
-  readonly hasMore: boolean;
-}
+export type { PhotoSource, ResponseMeta, RestaurantSource } from '../domain/api-contract';
 
 export interface RestaurantsResponse {
   readonly restaurants: Restaurant[];

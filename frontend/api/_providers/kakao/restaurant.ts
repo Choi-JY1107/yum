@@ -1,10 +1,10 @@
-import type { Coordinates } from '../../src/lib/domain/location.js';
+import type { Coordinates } from '../../../src/lib/domain/location.js';
 import type {
   RestaurantProvider,
   RestaurantSummary,
   SearchOptions,
   SearchResult,
-} from './types.js';
+} from '../types.js';
 
 const KAKAO_API_URL = 'https://dapi.kakao.com/v2/local/search/category.json';
 const FOOD_CATEGORY_CODE = 'FD6'; // 음식점

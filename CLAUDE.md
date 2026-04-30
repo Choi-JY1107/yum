@@ -65,21 +65,26 @@ yum/
 │   │   ├── _data.ts               ← 장난스러운 mock fallback 데이터
 │   │   └── _providers/            ← Adapter 패턴 (ADR-0009)
 │   │       ├── types.ts           ← RestaurantProvider, PhotoProvider 인터페이스
-│   │       ├── factory.ts         ← env 기반 구현체 선택 (Kakao/Naver/Mock)
+│   │       ├── factory.ts         ← env 기반 구현체 선택
 │   │       ├── build-response.ts  ← 응답 빌더 + 런타임 fallback 오케스트레이션
-│   │       ├── kakao-restaurant-provider.ts
-│   │       ├── naver-photo-provider.ts
-│   │       ├── mock-restaurant-provider.ts
-│   │       └── mock-photo-provider.ts
+│   │       ├── parse-query.ts     ← 쿼리 파싱 (Vercel+Vite 공유)
+│   │       ├── kakao/restaurant.ts
+│   │       ├── naver/photo.ts
+│   │       └── mock/{restaurant,photo}.ts
+│   ├── public/logo.png            ← 헤더 로고
 │   ├── .env.example               ← API 키 템플릿 (.env.local로 복사 후 채움)
 │   ├── vite.config.ts             ← dev: mock middleware (build-response.ts 공유)
 │   └── src/
 │       └── lib/
 │           ├── domain/            ← 순수 타입·규칙
 │           ├── application/       ← 유스케이스 + 화면 상태머신
-│           ├── infrastructure/    ← API 클라이언트 (fetch)
-│           ├── styles/            ← global.css (디자인 토큰)
+│           ├── infrastructure/    ← 외부 의존 (fetch, geolocation)
+│           ├── styles/            ← global.css (디자인 토큰 + 그라데이션 배경)
 │           └── ui/                ← Svelte 컴포넌트
+│               ├── consent/       ← LocationConsent + CategoryFilter
+│               ├── swipe/         ← SwipeDeck + RestaurantCard + ActionButtons
+│               ├── banners/       ← Banners + LocationFallback + MockData
+│               └── status/        ← LoadingScreen + ErrorScreen
 └── backend/                       ← Go 또는 Node.js (다음 단계)
 ```
 
@@ -90,9 +95,14 @@ yum/
 
 ## 🚦 현재 상태 (스냅샷)
 
-- **실데이터 연동 완료** ✅ (Phase 1~4) — 카카오 식당 + 네이버 사진 + Adapter + mock fallback + 배너
-- **MVP 1차 구현 완료** ✅ — 위치 동의 → API 호출 → 스와이프 카드 (`cd frontend && npm run dev` → http://localhost:5173)
-- **MVP 스코프:** 스와이프 탐색 화면 1개만 (위치 동의 + 로딩 + 에러 + 임시데이터 배너)
+- **실데이터 연동 완료** ✅ — 카카오 식당 + 네이버 사진 + Adapter + mock fallback + 배너
+- **사용자 위치 기반** ✅ — `navigator.geolocation` (실패 시 마곡 fallback + 배너)
+- **카테고리 필터** ✅ — consent 화면에서 한식/중식/일식/양식/분식/패스트푸드 선택 (검색 시작 직전)
+- **페이지네이션** ✅ — 카드 잔량 ≤ 3 시 백그라운드 prefetch
+- **그만하기 pill** ✅ — 헤더 우상단 ♥ N 카운터 + 종료
+- **로고 이미지** ✅ — `frontend/public/logo.png`
+- **배경 그라데이션** ✅ — body에 2색 (좌하 #fedfb3 + 우하 #ff937e + linear)
+- **MVP 1차 구현 완료** ✅ — 모든 위 기능 (`cd frontend && npm run dev` → http://localhost:5173)
 - **플랫폼:** 모바일 웹 (반응형)
 - **프론트엔드:** **Svelte 5 + Vite + TypeScript** (ADR-0001, 0004 ✅)
 - **디렉토리:** **모노레포** `frontend/` + `backend/` (ADR-0005 ✅)

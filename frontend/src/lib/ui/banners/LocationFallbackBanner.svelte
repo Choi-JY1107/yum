@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { GeolocationFailureReason } from '../infrastructure/geolocation';
+  import type { GeolocationFailureReason } from '../../infrastructure/geolocation';
 
   interface Props {
     reason?: GeolocationFailureReason | null;

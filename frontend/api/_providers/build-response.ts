@@ -1,8 +1,8 @@
 import type { Coordinates } from '../../src/lib/domain/location.js';
 import type { Restaurant } from '../../src/lib/domain/restaurant.js';
 import { getPhotoProvider, getRestaurantProvider } from './factory.js';
-import { MockPhotoProvider } from './mock-photo-provider.js';
-import { MockRestaurantProvider } from './mock-restaurant-provider.js';
+import { MockPhotoProvider } from './mock/photo.js';
+import { MockRestaurantProvider } from './mock/restaurant.js';
 import type {
   PhotoSource,
   ResponseMeta,
