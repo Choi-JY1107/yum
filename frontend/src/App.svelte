@@ -5,6 +5,7 @@
   import ErrorScreen from './lib/ui/status/ErrorScreen.svelte';
   import Banners from './lib/ui/banners/Banners.svelte';
   import SwipeDeck from './lib/ui/swipe/SwipeDeck.svelte';
+  import KeptList from './lib/ui/kept/KeptList.svelte';
   import { AppFlowStore } from './lib/application/app-flow.svelte';
 
   const flow = new AppFlowStore();
@@ -61,7 +62,14 @@
       usedFallbackLocation={flow.usedFallbackLocation}
       locationFallbackReason={flow.locationFallbackReason}
     />
-    <SwipeDeck store={flow.deck} loadingMore={flow.loadingMore} />
+    {#if flow.deck.isFinished && !flow.loadingMore}
+      <KeptList
+        restaurants={flow.deck.likedRestaurants}
+        onSearchAgain={() => flow.grantLocation()}
+      />
+    {:else}
+      <SwipeDeck store={flow.deck} loadingMore={flow.loadingMore} />
+    {/if}
   {/if}
 </main>
 

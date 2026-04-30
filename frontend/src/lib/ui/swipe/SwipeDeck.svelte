@@ -61,20 +61,12 @@
 
 <section class="swipe-deck">
   <div class="swipe-deck__stage">
-    {#if store.isFinished}
+    {#if store.isFinished && loadingMore}
       <div class="swipe-deck__empty">
-        {#if loadingMore}
-          <div class="swipe-deck__empty-spinner" aria-hidden="true"></div>
-          <p class="swipe-deck__empty-title">더 찾는 중…</p>
-        {:else}
-          <p class="swipe-deck__empty-title">오늘의 후보를 다 봤어요</p>
-          <p class="swipe-deck__empty-meta">킵한 가게 {store.likedIds.length}곳</p>
-          <button type="button" class="swipe-deck__reset" onclick={() => store.reset()}>
-            다시 시작
-          </button>
-        {/if}
+        <div class="swipe-deck__empty-spinner" aria-hidden="true"></div>
+        <p class="swipe-deck__empty-title">더 찾는 중…</p>
       </div>
-    {:else}
+    {:else if !store.isFinished}
       <div
         class="swipe-deck__hit-area"
         {...usePan(handlePan, () => ({ delay: 0, touchAction: 'none' }), { onpanup: handlePanUp })}
@@ -135,19 +127,6 @@
     font-size: var(--font-size-lg);
     font-weight: 700;
     margin: 0 0 var(--space-sm);
-  }
-
-  .swipe-deck__empty-meta {
-    color: var(--color-text-muted);
-    margin: 0 0 var(--space-lg);
-  }
-
-  .swipe-deck__reset {
-    padding: var(--space-sm) var(--space-lg);
-    background: var(--color-accent);
-    color: white;
-    border-radius: var(--radius-md);
-    font-weight: 600;
   }
 
   .swipe-deck__empty-spinner {

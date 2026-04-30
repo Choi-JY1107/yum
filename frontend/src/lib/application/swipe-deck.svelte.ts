@@ -34,6 +34,11 @@ export class SwipeDeckStore {
       .map((entry) => entry.restaurantId);
   }
 
+  get likedRestaurants(): Restaurant[] {
+    const liked = this.likedIds;
+    return this.all.filter((r) => liked.includes(r.id));
+  }
+
   swipe(direction: SwipeDirection): void {
     const target = this.all[this.cursor];
     if (!target) return;
