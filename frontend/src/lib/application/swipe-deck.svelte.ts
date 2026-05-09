@@ -7,6 +7,7 @@ export class SwipeDeckStore {
   private all = $state<Restaurant[]>([]);
   private cursor = $state(0);
   private history = $state<SwipeResult[]>([]);
+  private stopped = $state(false);
 
   constructor(restaurants: Restaurant[]) {
     this.all = restaurants;
@@ -24,8 +25,14 @@ export class SwipeDeckStore {
     return this.all.length - this.cursor;
   }
 
+  // 사용자가 카드 다 봤거나 명시적으로 그만하기 누른 상태 — 둘 다 KeptList로
   get isFinished(): boolean {
-    return this.cursor >= this.all.length;
+    return this.stopped || this.cursor >= this.all.length;
+  }
+
+  // 사용자가 명시적으로 그만한 경우 — prefetch trigger 차단용
+  get isStopped(): boolean {
+    return this.stopped;
   }
 
   get likedIds(): string[] {
@@ -51,13 +58,22 @@ export class SwipeDeckStore {
     this.all = [...this.all, ...more];
   }
 
-  // 사용자가 "그만하기" → cursor를 끝으로 이동시켜 isFinished 트리거
+  // 사용자가 "그만하기" → stopped 플래그만 set. cursor 건드리면 prefetch가
+  // remaining=0을 보고 다음 페이지를 자동 로드해버려서 안 멈춤.
   finishEarly(): void {
-    this.cursor = this.all.length;
+    this.stopped = true;
+  }
+
+  // 킵 리스트에서 식당 한 곳 삭제 (history의 right 엔트리 제거)
+  unkeep(restaurantId: string): void {
+    this.history = this.history.filter(
+      (entry) => !(entry.direction === 'right' && entry.restaurantId === restaurantId),
+    );
   }
 
   reset(): void {
     this.cursor = 0;
     this.history = [];
+    this.stopped = false;
   }
 }

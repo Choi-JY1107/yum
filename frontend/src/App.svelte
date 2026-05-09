@@ -13,10 +13,12 @@
   const PREFETCH_THRESHOLD = 3;
 
   // 카드 잔량이 임계값 이하 + 더 받을 수 있으면 백그라운드 prefetch
+  // (사용자가 그만하기 누르면 isStopped=true → prefetch 차단)
   $effect(() => {
     if (
       flow.phase === 'ready' &&
       flow.deck &&
+      !flow.deck.isStopped &&
       flow.deck.remaining <= PREFETCH_THRESHOLD &&
       flow.meta?.hasMore &&
       !flow.loadingMore
@@ -66,6 +68,7 @@
       <KeptList
         restaurants={flow.deck.likedRestaurants}
         onSearchAgain={() => flow.grantLocation()}
+        onRemove={(id) => flow.deck?.unkeep(id)}
       />
     {:else}
       <SwipeDeck store={flow.deck} loadingMore={flow.loadingMore} />

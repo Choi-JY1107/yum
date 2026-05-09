@@ -58,8 +58,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* 화면 전체 배경 — 좌하 radial(#fedfb3) + 우하 radial(#ff937e) + linear 베이스
-   원본 구조 유지, 색만 교체 (사용자 지정). 애니메이션 없음. */
+/* 화면 전체 배경 — 좌하 radial(#fedfb3) + 우하 radial(#ff937e) + linear 베이스 */
 body {
   background:
     radial-gradient(
